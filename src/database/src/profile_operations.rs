@@ -58,7 +58,7 @@ pub async fn get_profile_by_id(
     let target_profile = profile::Entity::find_by_id(profile_id)
         .one(connection)
         .await?
-        .ok_or(DbErr::Query(
+        .ok_or(DbErr::Custom(
             "Couldn't find a profile with the specified identifier.".to_owned(),
         ));
 
@@ -83,7 +83,7 @@ pub async fn check_profile_exists(
     let target_profile = get_profile_by_id(profile_id, connection).await;
 
     if target_profile.is_err() {
-        return Err(DbErr::Query(
+        return Err(DbErr::Custom(
             "Couldn't find a profile with the specified identifier.".to_owned(),
         ));
     }

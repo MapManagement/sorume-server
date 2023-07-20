@@ -22,7 +22,8 @@ pub async fn insert_group_chat(
         ..Default::default()
     }
     .insert(connection)
-    .await;
+    .await
+    .unwrap();
 
     let mut new_members = Vec::new();
 
@@ -33,9 +34,11 @@ pub async fn insert_group_chat(
             continue;
         }
 
+        let group_chat_id = new_group_chat.group_chat_id;
+
         let new_member = insert_group_chat_member(
             member_profile.unwrap().profile_id,
-            new_group_chat.clone().unwrap().group_chat_id,
+            group_chat_id,
             connection,
         )
         .await;
@@ -43,7 +46,7 @@ pub async fn insert_group_chat(
         new_members.push(new_member.unwrap());
     }
 
-    return new_group_chat;
+    return Ok(new_group_chat);
 }
 
 pub async fn update_group_chat(
@@ -60,7 +63,7 @@ pub async fn update_group_chat(
 
             Ok(target_group_chat.update(connection).await?)
         }
-        _ => Err(DbErr::Query(
+        _ => Err(DbErr::Custom(
             "Couldn't find a group chat with the specified identifier.".to_owned(),
         )),
     }
@@ -73,7 +76,7 @@ pub async fn get_group_chat_by_id(
     let target_group_chat = group_chat::Entity::find_by_id(group_chat_id)
         .one(connection)
         .await?
-        .ok_or(DbErr::Query(
+        .ok_or(DbErr::Custom(
             "Couldn't find a group chat with the specified identifier.".to_owned(),
         ));
 
@@ -87,7 +90,7 @@ pub async fn delete_group_chat_by_id(
     let delete_result = delete_members_of_group(group_chat_id, connection).await;
 
     if delete_result.is_err() {
-        return Err(DbErr::Exec(
+        return Err(DbErr::Custom(
             "Couldn't delete any group chat members.".to_owned(),
         ));
     }
@@ -106,7 +109,7 @@ pub async fn check_group_chat_exists(
     let target_group_chat = get_group_chat_by_id(group_chat_id, connection).await;
 
     if target_group_chat.is_err() {
-        return Err(DbErr::Query(
+        return Err(DbErr::Custom(
             "Couldn't find a group chat with the specified identifier.".to_owned(),
         ));
     }

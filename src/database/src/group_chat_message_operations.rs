@@ -1,4 +1,4 @@
-use crate::{get_group_chat_by_id, check_group_chat_exists, check_profile_exists};
+use crate::{check_group_chat_exists, check_profile_exists};
 use entities::*;
 use sea_orm::*;
 
@@ -42,7 +42,7 @@ pub async fn get_group_message_by_id(
     let target_message = group_chat_message::Entity::find_by_id(message_id)
         .one(connection)
         .await?
-        .ok_or(DbErr::Query(
+        .ok_or(DbErr::Custom(
             "Couldn't find a group message with the specified identifier.".to_owned(),
         ));
 
@@ -103,7 +103,7 @@ pub async fn update_group_message(
     let target_message = get_group_message_by_id(message_id, connection).await;
 
     if target_message.is_err() {
-        return Err(DbErr::Query(
+        return Err(DbErr::Custom(
             "Couldn't find a group message with the specified identifier.".to_owned(),
         ));
     }
@@ -124,7 +124,7 @@ pub async fn delete_single_group_message(
         .await?;
 
     if target_message.is_none() {
-        return Err(DbErr::Query(
+        return Err(DbErr::Custom(
             "Couldn't find a group chat with the specified identifier.".to_owned(),
         ));
     }
@@ -184,7 +184,7 @@ pub async fn check_group_message_exists(
     let target_message = get_group_message_by_id(message_id, connection).await;
 
     if target_message.is_err() {
-        return Err(DbErr::Query(
+        return Err(DbErr::Custom(
             "Couldn't find a group chat with the specified identifier.".to_owned(),
         ));
     }

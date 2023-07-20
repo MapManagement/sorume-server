@@ -1,4 +1,4 @@
-use crate::{check_profile_exists, get_group_chat_by_id, check_group_chat_exists};
+use crate::{check_group_chat_exists, check_profile_exists};
 use entities::*;
 use sea_orm::*;
 
@@ -93,7 +93,7 @@ pub async fn delete_single_membership(
         .await?;
 
     if target_membership.is_none() {
-        return Err(DbErr::Query(
+        return Err(DbErr::Custom(
             "Couldn't find a group chat with the specified identifier.".to_owned(),
         ));
     }

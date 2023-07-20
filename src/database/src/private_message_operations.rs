@@ -57,7 +57,7 @@ pub async fn get_private_message_by_id(
     let target_message = private_message::Entity::find_by_id(message_id)
         .one(connection)
         .await?
-        .ok_or(DbErr::Query(
+        .ok_or(DbErr::Custom(
             "Couldn't find a message with the specified identifier.".to_owned(),
         ));
 
