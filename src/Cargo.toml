@@ -1,5 +1,5 @@
 [package]
-name = "network_backend"
+name = "sorume-server"
 version = "0.1.0"
 edition = "2021"
 
@@ -13,3 +13,4 @@ sea-orm = { version = "0.11.3", features = [ "sqlx-mysql", "runtime-async-std-na
 futures = "0.3.28"
 api = { path = "api" }
 migration = { path = "migration" }
+database = { path = "database" }

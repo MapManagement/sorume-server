@@ -1,9 +1,8 @@
+use database::connect_to_database;
 use futures::executor::block_on;
 use migration::{Migrator, MigratorTrait, SchemaManager};
-use sea_orm::{ConnectionTrait, Database, DbErr, Statement};
+use sea_orm::DbErr;
 
-const DATABASE_URL: &str = "mysql://jan:jan@localhost:3306";
-const DATABASE_NAME: &str = "sorume";
 const BASE_TABLES: [&'static str; 5] = [
     "profile",
     "private_message",
@@ -13,30 +12,28 @@ const BASE_TABLES: [&'static str; 5] = [
 ];
 
 fn main() {
-    block_on(run_migrations());
-    api::run();
+    let migration_result = block_on(run_migrations());
+
+    if let Some(err) = migration_result.err() {
+        println!("Migrations failed: {err}");
+    }
+
+    let api_result = api::run();
+
+    if let Some(err) = api_result.err() {
+        println!("API failed: {err}");
+    }
 }
 
 async fn run_migrations() -> Result<(), DbErr> {
-    let mut db_connection = Database::connect(DATABASE_URL).await?;
-
-    db_connection
-        .execute(Statement::from_string(
-            db_connection.get_database_backend(),
-            format!("CREATE DATABASE IF NOT EXISTS {};", DATABASE_NAME),
-        ))
-        .await?;
-
-    let db_url = format!("{}/{}", DATABASE_URL, DATABASE_NAME);
-    db_connection = Database::connect(&db_url).await?;
+    let db_connection = connect_to_database(true).await?;
 
     let schema_manager = SchemaManager::new(&db_connection);
+    Migrator::refresh(&db_connection).await?;
 
     for base_table in BASE_TABLES {
         assert!(schema_manager.has_table(base_table).await?);
     }
-
-    Migrator::refresh(&db_connection).await?;
 
     Ok(())
 }
