@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  sorume-server:
+    container_name: sorume-server
+    image: sorume-server
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+    environment:
+      - MARIADB_USER=${DB_USER}
+      - MARIADB_USER_PASSWORD=${DB_USER_PASSWORD}
+      - MARIADB_DATABASE=${DB_DATABASE}
+      - MARIADB_HOST=mariadb
+    env_file:
+      - .env
+    depends_on:
+      - mariadb
+  
+  mariadb:
+    container_name: Sorume-DB
+    image: mariadb
+    expose:
+      - 3306
+    restart: unless-stopped
+    environment:
+      - MARIADB_USER=${DB_USER}
+      - MARIADB_PASSWORD=${DB_USER_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${DB_DATABASE}
+    env_file:
+      - .env
