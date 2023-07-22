@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
+    inputs:
+      parameter:
+        description: Manual workflow run
 
 env:
   REGISTRY: ghcr.io
