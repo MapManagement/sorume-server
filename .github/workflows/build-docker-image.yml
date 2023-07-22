@@ -20,7 +20,6 @@ jobs:
       contents: read
       packages: write
 
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
 
       - name: Checkout repository
