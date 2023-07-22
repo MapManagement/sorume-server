@@ -1,5 +1,4 @@
 use crate::api_models::create::*;
-use crate::api_models::update::*;
 use crate::AppState;
 use actix_web::*;
 use database::*;
