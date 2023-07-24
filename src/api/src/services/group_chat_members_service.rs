@@ -1,4 +1,4 @@
-use crate::api_models::create::*;
+use crate::api_models::group_chat_member_schema::*;
 use crate::AppState;
 use actix_web::*;
 use database::*;
@@ -7,7 +7,7 @@ use database::*;
 async fn new_group_chat_member(
     data: web::Data<AppState>,
     group_chat_id: web::Path<i32>,
-    new_group_chat_member: web::Json<NewGroupChatMember>,
+    new_group_chat_member: web::Json<PostGroupChatMember>,
 ) -> impl Responder {
     let db_connection = &data.db_connection;
 

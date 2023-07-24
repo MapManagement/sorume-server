@@ -8,5 +8,6 @@ edition = "2021"
 [dependencies]
 actix-web = "4"
 serde = { version = " 1.0.163", features = ["derive"] }
+serde_with = { version = "3.1.0", features = ["chrono"] }
 database = { path = "../database" }
 entities = { path = "../entities" }

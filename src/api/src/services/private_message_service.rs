@@ -1,15 +1,12 @@
-use crate::{
-    api_models::{read::PrivateChatSchema, update::UpdatePrivateMessage},
-    AppState,
-};
+use crate::api_models::private_message_schema::*;
+use crate::AppState;
 use actix_web::*;
 use database::*;
-use entities::private_message;
 
 #[post("/private_message/new")]
 async fn new_private_message(
     data: web::Data<AppState>,
-    new_private_message: web::Json<private_message::Model>,
+    new_private_message: web::Json<PostPrivateMessage>,
 ) -> impl Responder {
     let db_connection = &data.db_connection;
 
@@ -38,7 +35,15 @@ async fn get_private_message(
         get_private_message_by_id(private_message_id.to_owned(), &db_connection).await;
 
     match query_result {
-        Ok(private_message) => HttpResponse::Ok().json(private_message),
+        Ok(private_message) => {
+            let message_schema = GetPrivateMessage {
+                sender_id: private_message.sender_id,
+                recipient_id: private_message.recipient_id,
+                content: private_message.content,
+            };
+
+            HttpResponse::Ok().json(message_schema)
+        }
         Err(_) => HttpResponse::NotFound().body("Couldn't find the specified private message!"),
     }
 }
@@ -46,7 +51,7 @@ async fn get_private_message(
 #[post("/private_message/chat")]
 async fn get_private_chat_messages(
     data: web::Data<AppState>,
-    private_chat: web::Json<PrivateChatSchema>,
+    private_chat: web::Json<DeletePostPrivateChat>,
 ) -> impl Responder {
     let db_connection = &data.db_connection;
 
@@ -66,7 +71,7 @@ async fn get_private_chat_messages(
 #[patch("/private_message/{private_message_id}")]
 async fn update_private_message(
     data: web::Data<AppState>,
-    updated_fields: web::Json<UpdatePrivateMessage>,
+    updated_fields: web::Json<PatchPrivateMessage>,
     private_message_id: web::Path<i32>,
 ) -> impl Responder {
     let db_connection = &data.db_connection;
@@ -111,7 +116,7 @@ async fn delete_private_message(
 #[delete("/private_message/chat/delete")]
 async fn delete_private_chat_messages(
     data: web::Data<AppState>,
-    private_chat: web::Json<PrivateChatSchema>,
+    private_chat: web::Json<DeletePostPrivateChat>,
 ) -> impl Responder {
     let db_connection = &data.db_connection;
 

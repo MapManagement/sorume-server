@@ -1,8 +1,7 @@
-use crate::api_models::update::*;
+use crate::api_models::profile_schema::*;
 use crate::AppState;
 use actix_web::*;
 use database::*;
-use entities::*;
 
 #[get("/")]
 async fn index() -> impl Responder {
@@ -12,10 +11,11 @@ async fn index() -> impl Responder {
 #[post("/profile/new")]
 async fn new_profile(
     data: web::Data<AppState>,
-    new_profile: web::Json<profile::Model>,
+    new_profile: web::Json<PostProfile>,
 ) -> impl Responder {
     let db_connection = &data.db_connection;
 
+    // TODO: hash password
     let result = insert_profile(
         &new_profile.username,
         &new_profile.password,
@@ -37,7 +37,15 @@ async fn get_profile(data: web::Data<AppState>, profile_id: web::Path<i32>) -> i
     let query_result = get_profile_by_id(profile_id.to_owned(), &db_connection).await;
 
     match query_result {
-        Ok(profile) => HttpResponse::Ok().json(profile),
+        Ok(profile) => {
+            let profile_schema = GetProfile {
+                username: profile.username,
+                email_address: profile.email_address,
+                join_datetime: profile.join_datetime,
+            };
+
+            HttpResponse::Ok().json(profile_schema)
+        }
         Err(_) => HttpResponse::NotFound().body("Couldn't find the specified profile!"),
     }
 }
@@ -45,7 +53,7 @@ async fn get_profile(data: web::Data<AppState>, profile_id: web::Path<i32>) -> i
 #[patch("/profile/{profile_id}")]
 async fn update_profile(
     data: web::Data<AppState>,
-    updated_fields: web::Json<UpdateProfileSchema>,
+    updated_fields: web::Json<PatchProfile>,
     profile_id: web::Path<i32>,
 ) -> impl Responder {
     let db_connection = &data.db_connection;

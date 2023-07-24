@@ -1,5 +1,4 @@
-use crate::api_models::create::*;
-use crate::api_models::update::*;
+use crate::api_models::group_chat_schema::*;
 use crate::AppState;
 use actix_web::*;
 use database::*;
@@ -8,7 +7,7 @@ use database::*;
 #[post("/group_chat/new")]
 async fn new_group_chat(
     data: web::Data<AppState>,
-    new_group_chat: web::Json<NewGroupChatSchema>,
+    new_group_chat: web::Json<PostGroupChat>,
 ) -> impl Responder {
     let db_connection = &data.db_connection;
 
@@ -30,7 +29,14 @@ async fn get_group_chat(
     let query_result = get_group_chat_by_id(group_chat_id.to_owned(), &db_connection).await;
 
     match query_result {
-        Ok(profile) => HttpResponse::Ok().json(profile),
+        Ok(group_chat) => {
+            let group_chat_schema = GetGroupChat {
+                creation_date: group_chat.creation_date,
+                group_picture: group_chat.group_picture,
+            };
+
+            HttpResponse::Ok().json(group_chat_schema)
+        }
         Err(_) => HttpResponse::NotFound().body("Couldn't find the specified group chat!"),
     }
 }
@@ -38,7 +44,7 @@ async fn get_group_chat(
 #[patch("/group_chat/{group_chat_id}")]
 async fn update_group_chat(
     data: web::Data<AppState>,
-    updated_fields: web::Json<UpdateGroupChatSchema>,
+    updated_fields: web::Json<PatchGroupChat>,
     group_chat_id: web::Path<i32>,
 ) -> impl Responder {
     let db_connection = &data.db_connection;
