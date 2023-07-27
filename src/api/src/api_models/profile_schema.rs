@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
 use serde_with::chrono::NaiveDateTime;
+use utoipa::ToSchema;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct PostProfile {
     pub username: String,
     pub password: String,
@@ -9,14 +10,14 @@ pub struct PostProfile {
 }
 
 // TODO: profile picture
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, ToSchema)]
 pub struct GetProfile {
     pub username: String,
     pub email_address: String,
     pub join_datetime: NaiveDateTime,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct PatchProfile {
     pub username: Option<String>,
     pub password: Option<String>,

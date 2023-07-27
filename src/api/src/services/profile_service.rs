@@ -8,8 +8,15 @@ async fn index() -> impl Responder {
     HttpResponse::Ok().body("Successful!")
 }
 
+#[utoipa::path(
+    request_body = PostProfile,
+    responses(
+        (status = 201, description = "Success!"),
+        (status = 500, description = "Error!")
+    )
+)]
 #[post("/profile/new")]
-async fn new_profile(
+pub(super) async fn new_profile(
     data: web::Data<AppState>,
     new_profile: web::Json<PostProfile>,
 ) -> impl Responder {
@@ -25,13 +32,25 @@ async fn new_profile(
     .await;
 
     match result {
-        Ok(_) => HttpResponse::Ok().body("Success!"),
+        Ok(_) => HttpResponse::Created().body("Success!"),
         Err(_) => HttpResponse::InternalServerError().body("Error!"),
     }
 }
 
+#[utoipa::path(
+    params(
+        ("profile_id", description = "Identifier of profile")
+    ),
+    responses(
+        (status = 200, body = GetProfile),
+        (status = 404, description = "Couldn't find the specified profile!")
+    )
+)]
 #[get("/profile/{profile_id}")]
-async fn get_profile(data: web::Data<AppState>, profile_id: web::Path<i32>) -> impl Responder {
+pub(super) async fn get_profile(
+    data: web::Data<AppState>,
+    profile_id: web::Path<i32>,
+) -> impl Responder {
     let db_connection = &data.db_connection;
 
     let query_result = get_profile_by_id(profile_id.to_owned(), &db_connection).await;
@@ -50,8 +69,18 @@ async fn get_profile(data: web::Data<AppState>, profile_id: web::Path<i32>) -> i
     }
 }
 
+#[utoipa::path(
+    request_body = PatchProfile,
+    params(
+        ("profile_id", description = "Identifier of profile")
+    ),
+    responses(
+        (status = 200, description = "Success!"),
+        (status = 404, description = "Couldn't find the specified profile!")
+    )
+)]
 #[patch("/profile/{profile_id}")]
-async fn update_profile(
+pub(super) async fn update_profile(
     data: web::Data<AppState>,
     updated_fields: web::Json<PatchProfile>,
     profile_id: web::Path<i32>,
@@ -93,15 +122,27 @@ async fn update_profile(
     }
 }
 
-#[delete("/profile/delete/{profile_id}")]
-async fn delete_profile(data: web::Data<AppState>, profile_id: web::Path<i32>) -> impl Responder {
+#[utoipa::path(
+    params(
+        ("profile_id", description = "Identifier of profile")
+    ),
+    responses(
+        (status = 200, description = "Success!"),
+        (status = 404, description = "Couldn't find the specified profile!")
+    )
+)]
+#[delete("/profile/{profile_id}")]
+pub(super) async fn delete_profile(
+    data: web::Data<AppState>,
+    profile_id: web::Path<i32>,
+) -> impl Responder {
     let db_connection = &data.db_connection;
 
     let delete_result = delete_profile_by_id(profile_id.to_owned(), &db_connection).await;
 
     match delete_result {
         Ok(_) => HttpResponse::Ok().body("Success!"),
-        Err(_) => HttpResponse::Ok().body("Error!"),
+        Err(_) => HttpResponse::NotFound().body("Couldn't find the specified profile!")
     }
 }
 

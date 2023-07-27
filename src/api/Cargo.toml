@@ -9,5 +9,7 @@ edition = "2021"
 actix-web = "4"
 serde = { version = " 1.0.163", features = ["derive"] }
 serde_with = { version = "3.1.0", features = ["chrono"] }
+utoipa = { version = "3", features = ["actix_extras", "chrono"] }
+utoipa-swagger-ui = { version = "3", features = ["actix-web"] }
 database = { path = "../database" }
 entities = { path = "../entities" }

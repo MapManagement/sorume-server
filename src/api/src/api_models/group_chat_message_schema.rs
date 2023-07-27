@@ -1,13 +1,14 @@
 use serde::{Deserialize, Serialize};
 use serde_with::chrono::NaiveDateTime;
+use utoipa::ToSchema;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct PostGroupChatMessage {
     pub author_id: i32,
     pub content: Option<String>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, ToSchema)]
 pub struct GetGroupChatMessage {
     pub message_id: i32,
     pub author_id: i32,
@@ -16,7 +17,7 @@ pub struct GetGroupChatMessage {
     pub chat_id: i32,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct PatchGroupChatMessage {
     pub content: String,
 }
