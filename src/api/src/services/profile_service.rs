@@ -7,7 +7,9 @@ use database::*;
 async fn index() -> impl Responder {
     HttpResponse::Ok().body("Successful!")
 }
-
+/// Create new profile
+///
+/// Create a new platform profile using the post data
 #[utoipa::path(
     request_body = PostProfile,
     responses(
@@ -37,6 +39,9 @@ pub(super) async fn new_profile(
     }
 }
 
+/// Get profile
+///
+/// Get a specific platform profile by its identifier
 #[utoipa::path(
     params(
         ("profile_id", description = "Identifier of profile")
@@ -69,6 +74,9 @@ pub(super) async fn get_profile(
     }
 }
 
+/// Update profile
+///
+/// Update a specific platform profile by its identifier and patch data
 #[utoipa::path(
     request_body = PatchProfile,
     params(
@@ -122,6 +130,9 @@ pub(super) async fn update_profile(
     }
 }
 
+/// Delete profile
+///
+/// Delete s specific platform profile by its identifier
 #[utoipa::path(
     params(
         ("profile_id", description = "Identifier of profile")
@@ -142,7 +153,7 @@ pub(super) async fn delete_profile(
 
     match delete_result {
         Ok(_) => HttpResponse::Ok().body("Success!"),
-        Err(_) => HttpResponse::NotFound().body("Couldn't find the specified profile!")
+        Err(_) => HttpResponse::NotFound().body("Couldn't find the specified profile!"),
     }
 }
 

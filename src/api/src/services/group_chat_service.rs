@@ -3,6 +3,9 @@ use crate::AppState;
 use actix_web::*;
 use database::*;
 
+/// Create new group chat
+///
+/// Create a new group chat using post data
 #[utoipa::path(
     request_body = PostGroupChat,
     responses(
@@ -26,6 +29,9 @@ pub(super) async fn new_group_chat(
     }
 }
 
+/// Get group chat
+///
+/// Get a specific group chat by its identifier
 #[utoipa::path(
     params(
         ("group_chat_id", description = "Identifier of group_chat")
@@ -57,6 +63,9 @@ pub(super) async fn get_group_chat(
     }
 }
 
+/// Update group chat
+///
+/// Update a specific group chat using its identifier and patch data
 #[utoipa::path(
     request_body = PatchGroupChat,
     params(
@@ -96,6 +105,9 @@ pub(super) async fn update_group_chat(
     }
 }
 
+/// Delete group chat
+///
+/// Delete a specific group chat by its identifier
 #[utoipa::path(
     params(
         ("group_chat_id", description = "Identifier of group chat")

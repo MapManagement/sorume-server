@@ -3,6 +3,9 @@ use crate::AppState;
 use actix_web::*;
 use database::*;
 
+/// Create new private message
+///
+/// Create a new private message using post data
 #[utoipa::path(
     request_body = PostPrivateMessage,
     responses(
@@ -31,6 +34,9 @@ pub(super) async fn new_private_message(
     }
 }
 
+/// Get private message
+///
+/// Get a specific private message by its identifier
 #[utoipa::path(
     params(
         ("private_message_id", description = "Identifier of private message")
@@ -64,6 +70,9 @@ pub(super) async fn get_private_message(
     }
 }
 
+/// Get all private messages of private chat
+///
+/// Retrieve all private messages of a specific private chat using post data
 #[utoipa::path(
     request_body = DeletePostPrivateChat,
     responses(
@@ -104,6 +113,9 @@ pub(super) async fn get_private_chat_messages(
     HttpResponse::Ok().json(messages)
 }
 
+/// Update private message
+///
+/// Update a specific private message using its identifier and patch data
 #[utoipa::path(
     request_body = PatchPrivateMessage,
     params(
@@ -144,6 +156,9 @@ pub(super) async fn update_private_message(
     }
 }
 
+/// Delete private message
+///
+/// Delete a specific private message by its identifier
 #[utoipa::path(
     params(
         ("private_message_id", description = "Identifier of private message")
@@ -169,6 +184,9 @@ pub(super) async fn delete_private_message(
     }
 }
 
+/// Delete all private messages of private chat
+///
+/// Delete all private message of a specific private chat by its identifier
 #[utoipa::path(
     request_body = DeletePostPrivateChat,
     responses(

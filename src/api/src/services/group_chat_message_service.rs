@@ -3,6 +3,9 @@ use crate::AppState;
 use actix_web::*;
 use database::*;
 
+/// Create new group chat
+///
+/// Create a group chat using the post data
 #[utoipa::path(
     request_body = PostGroupChatMessage,
     params(
@@ -66,6 +69,9 @@ async fn get_group_chat_messages(
     HttpResponse::Ok().json(messages)
 }*/
 
+/// Get all messages of group chat
+///
+/// Retrieve all chat messages of a specific group chat using its identifier
 #[utoipa::path(
     params(
         ("group_chat_id", description = "Identifier of group chat")
@@ -105,6 +111,9 @@ pub(super) async fn get_all_group_chat_messages(
     HttpResponse::Ok().json(messages)
 }
 
+/// Get all messages of a profile in a group chat
+///
+/// Retrieve all messages of a specific profile, in a specific group chat using their identifiers
 #[utoipa::path(
     params(
         ("group_chat_id", description = "Identifier of group chat"),
@@ -151,6 +160,9 @@ pub(super) async fn get_member_group_chat_messages(
     HttpResponse::Ok().json(messages)
 }
 
+/// Update group chat message
+///
+/// Update a specific group chat message using its identifier and patch data
 #[utoipa::path(
     request_body = PatchGroupChatMessage,
     params(
@@ -187,6 +199,9 @@ pub(super) async fn update_group_chat_message(
     }
 }
 
+/// Delete message in a group chat
+///
+/// Delete a specific message in a specific group chat using their identifiers
 #[utoipa::path(
     params(
         ("group_chat_id", description = "Identifier of group chat"),
@@ -217,6 +232,9 @@ pub(super) async fn delete_group_chat_message(
     }
 }
 
+/// Delete all messages of group chat
+///
+/// Delete all messages of a specific group chat using its identifier
 #[utoipa::path(
     params(
         ("group_chat_id", description = "Identifier of group chat")
@@ -241,6 +259,9 @@ pub(super) async fn delete_all_group_chat_messages(
     }
 }
 
+/// Delete all messages of profile in group chat
+///
+/// Delete all messages of a specific profile in a specific group chat using their identifiers
 #[utoipa::path(
     params(
         ("group_chat_id", description = "Identifier of group chat"),

@@ -3,6 +3,9 @@ use crate::AppState;
 use actix_web::*;
 use database::*;
 
+/// Add profile to group chat
+///
+/// Add a specific profile by post to an existing group chat
 #[utoipa::path(
     request_body = PostGroupChatMember,
     params(
@@ -34,6 +37,9 @@ pub(super) async fn new_group_chat_member(
     }
 }
 
+/// Get all profiles of group chat
+///
+/// Retrieve all profiles of a specific group chat using its identifier
 #[utoipa::path(
     params(
         ("group_chat_id", description = "Identifier of group chat")
@@ -69,6 +75,9 @@ pub(super) async fn get_all_group_chat_members(
     HttpResponse::Ok().json(group_members)
 }
 
+/// Remove all profiles from group chat
+///
+/// Remove all profiles of a specific group chat using its identifier
 #[utoipa::path(
     params(
         ("group_chat_id", description = "Identifier of group chat")
@@ -93,6 +102,9 @@ pub(super) async fn delete_all_group_chat_members(
     }
 }
 
+/// Remove single profile from group chat
+///
+/// Remove a specific profile from a given group chat using their identifiers
 #[utoipa::path(
     params(
         ("group_chat_id", description = "Identifier of group chat"),
