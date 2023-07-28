@@ -3,8 +3,18 @@ use crate::AppState;
 use actix_web::*;
 use database::*;
 
-#[post("/group_chat/{group_chat_id}/members")]
-async fn new_group_chat_member(
+#[utoipa::path(
+    request_body = PostGroupChatMember,
+    params(
+        ("group_chat_id", description = "Identifier of group chat")
+    ),
+    responses(
+        (status = 201, description = "Success!"),
+        (status = 404, description = "Couldn't find the specified group chat!"),
+    )
+)]
+#[post("/group_chat/{group_chat_id}/members/new")]
+pub(super) async fn new_group_chat_member(
     data: web::Data<AppState>,
     group_chat_id: web::Path<i32>,
     new_group_chat_member: web::Json<PostGroupChatMember>,
@@ -20,12 +30,21 @@ async fn new_group_chat_member(
 
     match insert_result {
         Ok(_) => HttpResponse::Ok().body("Success!"),
-        Err(_) => HttpResponse::Ok().body("Error!"),
+        Err(_) => HttpResponse::NotFound().body("Couldn't find the specified group chat!"),
     }
 }
 
+#[utoipa::path(
+    params(
+        ("group_chat_id", description = "Identifier of group chat")
+    ),
+    responses(
+        (status = 201, body = [GetGroupChatMember]),
+        (status = 404, description = "Couldn't find the specified group chat!"),
+    )
+)]
 #[get("/group_chat/{group_chat_id}/members")]
-async fn get_all_group_chat_members(
+pub(super) async fn get_all_group_chat_members(
     data: web::Data<AppState>,
     group_chat_id: web::Path<i32>,
 ) -> impl Responder {
@@ -33,15 +52,34 @@ async fn get_all_group_chat_members(
 
     let query_result = get_members_of_group(group_chat_id.to_owned(), db_connection).await;
 
-    // TODO: another return schema
-    match query_result {
-        Ok(members) => HttpResponse::Ok().json(members),
-        Err(_) => HttpResponse::NotFound().body("Couldn't find the specified group chat!"),
+    if query_result.is_err() {
+        return HttpResponse::NotFound().body("Couldn't find the specified group chat!");
     }
+
+    let mut group_members: Vec<GetGroupChatMember> = vec![];
+
+    for member in query_result.unwrap() {
+        let member_schema = GetGroupChatMember {
+            profile_id: member.profile_id,
+        };
+
+        group_members.push(member_schema);
+    }
+
+    HttpResponse::Ok().json(group_members)
 }
 
+#[utoipa::path(
+    params(
+        ("group_chat_id", description = "Identifier of group chat")
+    ),
+    responses(
+        (status = 201, description = "Success!"),
+        (status = 404, description = "Couldn't find the specified group chat!"),
+    )
+)]
 #[delete("/group_chat/{group_chat_id}/members")]
-async fn delete_all_group_chat_members(
+pub(super) async fn delete_all_group_chat_members(
     data: web::Data<AppState>,
     group_chat_id: web::Path<i32>,
 ) -> impl Responder {
@@ -55,8 +93,18 @@ async fn delete_all_group_chat_members(
     }
 }
 
+#[utoipa::path(
+    params(
+        ("group_chat_id", description = "Identifier of group chat"),
+        ("profile_id", description = "Identifier of profile")
+    ),
+    responses(
+        (status = 201, description = "Success!"),
+        (status = 404, description = "Couldn't find the specified group chat or profile!"),
+    )
+)]
 #[delete("/group_chat/{group_chat_id}/members/{profile_id}")]
-async fn delete_single_group_chat_member(
+pub(super) async fn delete_single_group_chat_member(
     data: web::Data<AppState>,
     group_chat_id: web::Path<i32>,
     profile_id: web::Path<i32>,
@@ -70,10 +118,11 @@ async fn delete_single_group_chat_member(
     )
     .await;
 
-    // TODO: error text
     match delete_result {
         Ok(_) => HttpResponse::Ok().body("Success!"),
-        Err(_) => HttpResponse::NotFound().body("Error!"),
+        Err(_) => {
+            HttpResponse::NotFound().body("Couldn't find the specified group chat or profile!")
+        }
     }
 }
 

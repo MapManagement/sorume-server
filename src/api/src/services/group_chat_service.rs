@@ -3,9 +3,16 @@ use crate::AppState;
 use actix_web::*;
 use database::*;
 
+#[utoipa::path(
+    request_body = PostGroupChat,
+    responses(
+        (status = 201, description = "Success!"),
+        (status = 500, description = "Error!")
+    )
+)]
 // TODO: group picture is not sent to database
 #[post("/group_chat/new")]
-async fn new_group_chat(
+pub(super) async fn new_group_chat(
     data: web::Data<AppState>,
     new_group_chat: web::Json<PostGroupChat>,
 ) -> impl Responder {
@@ -19,8 +26,17 @@ async fn new_group_chat(
     }
 }
 
+#[utoipa::path(
+    params(
+        ("group_chat_id", description = "Identifier of group_chat")
+    ),
+    responses(
+        (status = 201, body = GetGroupChat),
+        (status = 404, description = "Couldn't find the specified group chat!"),
+    )
+)]
 #[get("/group_chat/{group_chat_id}")]
-async fn get_group_chat(
+pub(super) async fn get_group_chat(
     data: web::Data<AppState>,
     group_chat_id: web::Path<i32>,
 ) -> impl Responder {
@@ -41,8 +57,19 @@ async fn get_group_chat(
     }
 }
 
+#[utoipa::path(
+    request_body = PatchGroupChat,
+    params(
+        ("group_chat_id", description = "Identifier of group chat")
+    ),
+    responses(
+        (status = 201, description = "Success!"),
+        (status = 404, description = "Couldn't find the specified group chat!"),
+        (status = 500, description = "Failed!")
+    )
+)]
 #[patch("/group_chat/{group_chat_id}")]
-async fn update_group_chat(
+pub(super) async fn update_group_chat(
     data: web::Data<AppState>,
     updated_fields: web::Json<PatchGroupChat>,
     group_chat_id: web::Path<i32>,
@@ -62,15 +89,24 @@ async fn update_group_chat(
 
             match update_result {
                 Ok(_) => HttpResponse::Ok().body("Success!"),
-                Err(_) => HttpResponse::NotFound().body("Failed!"),
+                Err(_) => HttpResponse::InternalServerError().body("Failed!"),
             }
         }
         Err(_) => HttpResponse::NotFound().body("Couldn't find the specified group chat!"),
     }
 }
 
+#[utoipa::path(
+    params(
+        ("group_chat_id", description = "Identifier of group chat")
+    ),
+    responses(
+        (status = 201, description = "Success!"),
+        (status = 404, description = "Couldn't find the specified group chat!"),
+    )
+)]
 #[delete("/group_chat/delete/{group_chat_id}")]
-async fn delete_group_chat(
+pub(super) async fn delete_group_chat(
     data: web::Data<AppState>,
     group_chat_id: web::Path<i32>,
 ) -> impl Responder {
@@ -80,7 +116,7 @@ async fn delete_group_chat(
 
     match delete_result {
         Ok(_) => HttpResponse::Ok().body("Success!"),
-        Err(_) => HttpResponse::Ok().body("Error!"),
+        Err(_) => HttpResponse::NotFound().body("Couldn't find the specified group chat!"),
     }
 }
 

@@ -3,8 +3,15 @@ use crate::AppState;
 use actix_web::*;
 use database::*;
 
+#[utoipa::path(
+    request_body = PostPrivateMessage,
+    responses(
+        (status = 201, description = "Success!"),
+        (status = 500, description = "Error!")
+    )
+)]
 #[post("/private_message/new")]
-async fn new_private_message(
+pub(super) async fn new_private_message(
     data: web::Data<AppState>,
     new_private_message: web::Json<PostPrivateMessage>,
 ) -> impl Responder {
@@ -24,8 +31,17 @@ async fn new_private_message(
     }
 }
 
+#[utoipa::path(
+    params(
+        ("private_message_id", description = "Identifier of private message")
+    ),
+    responses(
+        (status = 201, body = GetPrivateMessage),
+        (status = 404, description = "Couldn't find the specified private message!")
+    )
+)]
 #[get("/private_message/{private_message_id}")]
-async fn get_private_message(
+pub(super) async fn get_private_message(
     data: web::Data<AppState>,
     private_message_id: web::Path<i32>,
 ) -> impl Responder {
@@ -48,8 +64,15 @@ async fn get_private_message(
     }
 }
 
+#[utoipa::path(
+    request_body = DeletePostPrivateChat,
+    responses(
+        (status = 201, body = [GetPrivateMessage]),
+        (status = 404, description = "Couldn't find the specified private message!")
+    )
+)]
 #[post("/private_message/chat")]
-async fn get_private_chat_messages(
+pub(super) async fn get_private_chat_messages(
     data: web::Data<AppState>,
     private_chat: web::Json<DeletePostPrivateChat>,
 ) -> impl Responder {
@@ -62,14 +85,38 @@ async fn get_private_chat_messages(
     )
     .await;
 
-    match query_result {
-        Ok(private_messages) => HttpResponse::Ok().json(private_messages),
-        Err(_) => HttpResponse::NotFound().body("Couldn't find the specified private chat!"),
+    if query_result.is_err() {
+        return HttpResponse::NotFound().body("Couldn't find the specified private chat!");
     }
+
+    let mut messages: Vec<GetPrivateMessage> = vec![];
+
+    for message in query_result.unwrap() {
+        let message_schema = GetPrivateMessage {
+            sender_id: message.sender_id,
+            recipient_id: message.recipient_id,
+            content: message.content,
+        };
+
+        messages.push(message_schema);
+    }
+
+    HttpResponse::Ok().json(messages)
 }
 
+#[utoipa::path(
+    request_body = PatchPrivateMessage,
+    params(
+        ("private_message_id", description = "Identifier of private message")
+    ),
+    responses(
+        (status = 201, description = "Success!"),
+        (status = 404, description = "Couldn't find the specified private message!"),
+        (status = 500, description = "Failed!")
+    )
+)]
 #[patch("/private_message/{private_message_id}")]
-async fn update_private_message(
+pub(super) async fn update_private_message(
     data: web::Data<AppState>,
     updated_fields: web::Json<PatchPrivateMessage>,
     private_message_id: web::Path<i32>,
@@ -90,15 +137,24 @@ async fn update_private_message(
 
             match update_result {
                 Ok(_) => HttpResponse::Ok().body("Success!"),
-                Err(_) => HttpResponse::NotFound().body("Failed!"),
+                Err(_) => HttpResponse::InternalServerError().body("Failed!"),
             }
         }
         Err(_) => HttpResponse::NotFound().body("Couldn't find the specified private message!"),
     }
 }
 
+#[utoipa::path(
+    params(
+        ("private_message_id", description = "Identifier of private message")
+    ),
+    responses(
+        (status = 201, description = "Success!"),
+        (status = 500, description = "Error!")
+    )
+)]
 #[delete("/private_message/delete/{private_message_id}")]
-async fn delete_private_message(
+pub(super) async fn delete_private_message(
     data: web::Data<AppState>,
     private_message_id: web::Path<i32>,
 ) -> impl Responder {
@@ -109,12 +165,19 @@ async fn delete_private_message(
 
     match delete_result {
         Ok(_) => HttpResponse::Ok().body("Success!"),
-        Err(_) => HttpResponse::Ok().body("Error!"),
+        Err(_) => HttpResponse::InternalServerError().body("Error!"),
     }
 }
 
+#[utoipa::path(
+    request_body = DeletePostPrivateChat,
+    responses(
+        (status = 201, description = "Success!"),
+        (status = 500, description = "Error!")
+    )
+)]
 #[delete("/private_message/chat/delete")]
-async fn delete_private_chat_messages(
+pub(super) async fn delete_private_chat_messages(
     data: web::Data<AppState>,
     private_chat: web::Json<DeletePostPrivateChat>,
 ) -> impl Responder {
@@ -129,7 +192,7 @@ async fn delete_private_chat_messages(
 
     match delete_result {
         Ok(_) => HttpResponse::Ok().body("Success!"),
-        Err(_) => HttpResponse::Ok().body("Error!"),
+        Err(_) => HttpResponse::InternalServerError().body("Error!"),
     }
 }
 

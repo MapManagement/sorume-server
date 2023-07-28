@@ -27,6 +27,8 @@ pub async fn run() -> std::io::Result<()> {
             .configure(group_chat_service::group_chat_config)
             .configure(private_message_service::private_message_config)
             .configure(group_chat_members_service::group_chat_members_config)
+            .configure(group_chat_service::group_chat_config)
+            .configure(group_chat_message_service::group_chat_message_config)
             .service(
                 SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", openapi.clone()),
             )
