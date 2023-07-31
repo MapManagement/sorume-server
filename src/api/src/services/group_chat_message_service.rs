@@ -7,6 +7,7 @@ use database::*;
 ///
 /// Create a group chat using the post data
 #[utoipa::path(
+    tag = "Group Chat Message",
     request_body = PostGroupChatMessage,
     params(
         ("group_chat_id", description = "Identifier of group chat")
@@ -73,6 +74,7 @@ async fn get_group_chat_messages(
 ///
 /// Retrieve all chat messages of a specific group chat using its identifier
 #[utoipa::path(
+    tag = "Group Chat Message",
     params(
         ("group_chat_id", description = "Identifier of group chat")
     ),
@@ -115,6 +117,7 @@ pub(super) async fn get_all_group_chat_messages(
 ///
 /// Retrieve all messages of a specific profile, in a specific group chat using their identifiers
 #[utoipa::path(
+    tag = "Group Chat Message",
     params(
         ("group_chat_id", description = "Identifier of group chat"),
         ("profile_id", description = "Identifier of profile")
@@ -164,6 +167,7 @@ pub(super) async fn get_member_group_chat_messages(
 ///
 /// Update a specific group chat message using its identifier and patch data
 #[utoipa::path(
+    tag = "Group Chat Message",
     request_body = PatchGroupChatMessage,
     params(
         ("group_chat_id", description = "Identifier of group chat"),
@@ -203,6 +207,7 @@ pub(super) async fn update_group_chat_message(
 ///
 /// Delete a specific message in a specific group chat using their identifiers
 #[utoipa::path(
+    tag = "Group Chat Message",
     params(
         ("group_chat_id", description = "Identifier of group chat"),
         ("group_chat_message_id", description = "Identifier of group chat message")
@@ -236,6 +241,7 @@ pub(super) async fn delete_group_chat_message(
 ///
 /// Delete all messages of a specific group chat using its identifier
 #[utoipa::path(
+    tag = "Group Chat Message",
     params(
         ("group_chat_id", description = "Identifier of group chat")
     ),
@@ -263,6 +269,7 @@ pub(super) async fn delete_all_group_chat_messages(
 ///
 /// Delete all messages of a specific profile in a specific group chat using their identifiers
 #[utoipa::path(
+    tag = "Group Chat Message",
     params(
         ("group_chat_id", description = "Identifier of group chat"),
         ("profile_id", description = "Identifier of profile")

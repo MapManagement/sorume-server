@@ -7,6 +7,7 @@ use database::*;
 ///
 /// Add a specific profile by post to an existing group chat
 #[utoipa::path(
+    tag = "Group Chat Member",
     request_body = PostGroupChatMember,
     params(
         ("group_chat_id", description = "Identifier of group chat")
@@ -41,6 +42,7 @@ pub(super) async fn new_group_chat_member(
 ///
 /// Retrieve all profiles of a specific group chat using its identifier
 #[utoipa::path(
+    tag = "Group Chat Member",
     params(
         ("group_chat_id", description = "Identifier of group chat")
     ),
@@ -79,6 +81,7 @@ pub(super) async fn get_all_group_chat_members(
 ///
 /// Remove all profiles of a specific group chat using its identifier
 #[utoipa::path(
+    tag = "Group Chat Member",
     params(
         ("group_chat_id", description = "Identifier of group chat")
     ),
@@ -106,6 +109,7 @@ pub(super) async fn delete_all_group_chat_members(
 ///
 /// Remove a specific profile from a given group chat using their identifiers
 #[utoipa::path(
+    tag = "Group Chat Member",
     params(
         ("group_chat_id", description = "Identifier of group chat"),
         ("profile_id", description = "Identifier of profile")

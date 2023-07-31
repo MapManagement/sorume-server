@@ -7,6 +7,7 @@ use database::*;
 ///
 /// Create a new group chat using post data
 #[utoipa::path(
+    tag = "Group Chat",
     request_body = PostGroupChat,
     responses(
         (status = 201, description = "Success!"),
@@ -33,6 +34,7 @@ pub(super) async fn new_group_chat(
 ///
 /// Get a specific group chat by its identifier
 #[utoipa::path(
+    tag = "Group Chat",
     params(
         ("group_chat_id", description = "Identifier of group_chat")
     ),
@@ -67,6 +69,7 @@ pub(super) async fn get_group_chat(
 ///
 /// Update a specific group chat using its identifier and patch data
 #[utoipa::path(
+    tag = "Group Chat",
     request_body = PatchGroupChat,
     params(
         ("group_chat_id", description = "Identifier of group chat")
@@ -109,6 +112,7 @@ pub(super) async fn update_group_chat(
 ///
 /// Delete a specific group chat by its identifier
 #[utoipa::path(
+    tag = "Group Chat",
     params(
         ("group_chat_id", description = "Identifier of group chat")
     ),

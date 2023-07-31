@@ -11,6 +11,7 @@ async fn index() -> impl Responder {
 ///
 /// Create a new platform profile using the post data
 #[utoipa::path(
+    tag = "Profile",
     request_body = PostProfile,
     responses(
         (status = 201, description = "Success!"),
@@ -43,6 +44,7 @@ pub(super) async fn new_profile(
 ///
 /// Get a specific platform profile by its identifier
 #[utoipa::path(
+    tag = "Profile",
     params(
         ("profile_id", description = "Identifier of profile")
     ),
@@ -78,6 +80,7 @@ pub(super) async fn get_profile(
 ///
 /// Update a specific platform profile by its identifier and patch data
 #[utoipa::path(
+    tag = "Profile",
     request_body = PatchProfile,
     params(
         ("profile_id", description = "Identifier of profile")
@@ -134,6 +137,7 @@ pub(super) async fn update_profile(
 ///
 /// Delete s specific platform profile by its identifier
 #[utoipa::path(
+    tag = "Profile",
     params(
         ("profile_id", description = "Identifier of profile")
     ),

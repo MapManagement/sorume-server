@@ -7,6 +7,7 @@ use database::*;
 ///
 /// Create a new private message using post data
 #[utoipa::path(
+    tag = "Private Message",
     request_body = PostPrivateMessage,
     responses(
         (status = 201, description = "Success!"),
@@ -38,6 +39,7 @@ pub(super) async fn new_private_message(
 ///
 /// Get a specific private message by its identifier
 #[utoipa::path(
+    tag = "Private Message",
     params(
         ("private_message_id", description = "Identifier of private message")
     ),
@@ -74,6 +76,7 @@ pub(super) async fn get_private_message(
 ///
 /// Retrieve all private messages of a specific private chat using post data
 #[utoipa::path(
+    tag = "Private Message",
     request_body = DeletePostPrivateChat,
     responses(
         (status = 201, body = [GetPrivateMessage]),
@@ -117,6 +120,7 @@ pub(super) async fn get_private_chat_messages(
 ///
 /// Update a specific private message using its identifier and patch data
 #[utoipa::path(
+    tag = "Private Message",
     request_body = PatchPrivateMessage,
     params(
         ("private_message_id", description = "Identifier of private message")
@@ -160,6 +164,7 @@ pub(super) async fn update_private_message(
 ///
 /// Delete a specific private message by its identifier
 #[utoipa::path(
+    tag = "Private Message",
     params(
         ("private_message_id", description = "Identifier of private message")
     ),
@@ -188,6 +193,7 @@ pub(super) async fn delete_private_message(
 ///
 /// Delete all private message of a specific private chat by its identifier
 #[utoipa::path(
+    tag = "Private Message",
     request_body = DeletePostPrivateChat,
     responses(
         (status = 201, description = "Success!"),
