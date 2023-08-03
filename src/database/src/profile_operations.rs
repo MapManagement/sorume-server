@@ -1,5 +1,6 @@
 use chrono::Local;
 use entities::*;
+use log::*;
 use sea_orm::*;
 
 // TODO: profile picture
@@ -20,7 +21,16 @@ pub async fn insert_profile(
     .save(connection)
     .await;
 
-    return new_profile;
+    match new_profile {
+        Ok(profile) => {
+            info!("New profile has been created: {:?}", profile.profile_id);
+            return Ok(profile);
+        }
+        Err(err) => {
+            warn!("Unable to create a new profile: {}", err);
+            return Err(err);
+        }
+    }
 }
 
 pub async fn update_profile(

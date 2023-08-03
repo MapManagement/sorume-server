@@ -1,4 +1,5 @@
 mod api_models;
+mod logger;
 mod openapi;
 mod services;
 
@@ -6,7 +7,6 @@ use actix_web::*;
 use database::sea_orm::DatabaseConnection;
 use database::*;
 use services::*;
-use simplelog::*;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -21,13 +21,7 @@ pub async fn run() -> std::io::Result<()> {
 
     let openapi = openapi::ApiDoc::openapi();
 
-    CombinedLogger::init(vec![TermLogger::new(
-        LevelFilter::Debug,
-        Config::default(),
-        TerminalMode::Mixed,
-        ColorChoice::Auto,
-    )])
-    .unwrap();
+    logger::create_logger();
 
     HttpServer::new(move || {
         App::new()
