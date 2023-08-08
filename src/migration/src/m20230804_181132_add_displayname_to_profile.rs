@@ -39,21 +39,21 @@ impl MigrationTrait for Migration {
         db_connection
             .execute_unprepared(
                 "ALTER TABLE profile 
-                    DROP COLUMN displayname",
+                    DROP COLUMN IF EXISTS displayname",
             )
             .await?;
 
         db_connection
             .execute_unprepared(
                 "ALTER TABLE profile 
-                    MODIFY username NULL",
+                    MODIFY username varchar(32) NULL",
             )
             .await?;
 
         db_connection
             .execute_unprepared(
                 "ALTER TABLE profile 
-                    DROP CONSTRAINT unique_username",
+                    DROP CONSTRAINT IF EXISTS unique_username",
             )
             .await?;
 

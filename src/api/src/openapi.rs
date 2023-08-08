@@ -8,6 +8,7 @@ use utoipa::OpenApi;
     paths(
         profile_service::new_profile,
         profile_service::get_profile,
+        profile_service::get_profile_username,
         profile_service::update_profile,
         profile_service::delete_profile,
         private_message_service::new_private_message,

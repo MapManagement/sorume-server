@@ -1,6 +1,7 @@
 use crate::api_models::profile_schema::*;
 use crate::AppState;
 use actix_web::*;
+use database::sea_orm::DbErr;
 use database::*;
 
 #[get("/")]
@@ -15,6 +16,7 @@ async fn index() -> impl Responder {
     request_body = PostProfile,
     responses(
         (status = 201, description = "Success!"),
+        (status = 403, description = "Whitespaces cannot be used in usernames!"),
         (status = 500, description = "Error!")
     )
 )]
@@ -28,6 +30,7 @@ pub(super) async fn new_profile(
     // TODO: hash password
     let result = insert_profile(
         &new_profile.username,
+        &new_profile.displayname,
         &new_profile.password,
         &new_profile.email_address,
         &db_connection,
@@ -36,11 +39,14 @@ pub(super) async fn new_profile(
 
     match result {
         Ok(_) => HttpResponse::Created().body("Success!"),
-        Err(_) => HttpResponse::InternalServerError().body("Error!"),
+        Err(error) => match error {
+            DbErr::Custom(text) => HttpResponse::Forbidden().body(text),
+            _ => HttpResponse::InternalServerError().body("Error!"),
+        },
     }
 }
 
-/// Get profile
+/// Get profile by id
 ///
 /// Get a specific platform profile by its identifier
 #[utoipa::path(
@@ -66,6 +72,44 @@ pub(super) async fn get_profile(
         Ok(profile) => {
             let profile_schema = GetProfile {
                 username: profile.username,
+                displayname: profile.displayname.unwrap(),
+                email_address: profile.email_address,
+                join_datetime: profile.join_datetime,
+            };
+
+            HttpResponse::Ok().json(profile_schema)
+        }
+        Err(_) => HttpResponse::NotFound().body("Couldn't find the specified profile!"),
+    }
+}
+
+/// Get profile by username
+///
+/// Get a specific platform profile by its username
+#[utoipa::path(
+    tag = "Profile",
+    params(
+        ("username", description = "Username of profile")
+    ),
+    responses(
+        (status = 200, body = GetProfile),
+        (status = 404, description = "Couldn't find the specified profile!")
+    )
+)]
+#[get("/profile/username/{profile_username}")]
+pub(super) async fn get_profile_username(
+    data: web::Data<AppState>,
+    profile_username: web::Path<String>,
+) -> impl Responder {
+    let db_connection = &data.db_connection;
+
+    let query_result = get_profile_by_username(&profile_username, &db_connection).await;
+
+    match query_result {
+        Ok(profile) => {
+            let profile_schema = GetProfile {
+                username: profile.username,
+                displayname: profile.displayname.unwrap(),
                 email_address: profile.email_address,
                 join_datetime: profile.join_datetime,
             };
@@ -108,6 +152,10 @@ pub(super) async fn update_profile(
                     .username
                     .to_owned()
                     .unwrap_or(profile.username),
+                &updated_fields
+                    .displayname
+                    .to_owned()
+                    .unwrap_or(profile.displayname.unwrap()),
                 &updated_fields
                     .password
                     .to_owned()
@@ -164,6 +212,7 @@ pub(super) async fn delete_profile(
 pub fn profile_config(cfg: &mut web::ServiceConfig) {
     cfg.service(new_profile);
     cfg.service(get_profile);
+    cfg.service(get_profile_username);
     cfg.service(update_profile);
     cfg.service(delete_profile);
 }
