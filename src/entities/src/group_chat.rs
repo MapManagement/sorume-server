@@ -8,7 +8,6 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
     #[sea_orm(primary_key)]
     pub group_chat_id: i32,
-    #[serde(skip_deserializing)]
     pub creation_date: DateTime,
     pub group_picture: Option<String>,
 }

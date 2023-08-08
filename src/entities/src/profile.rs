@@ -8,12 +8,12 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
     #[sea_orm(primary_key)]
     pub profile_id: i32,
+    #[sea_orm(unique)]
     pub username: String,
+    pub displayname: Option<String>,
     pub password: String,
     pub email_address: String,
-    #[serde(skip_deserializing)]
     pub join_datetime: DateTime,
-    #[serde(skip_deserializing)]    
     pub profile_picture: Option<String>,
 }
 

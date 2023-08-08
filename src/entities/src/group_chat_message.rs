@@ -9,7 +9,6 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub message_id: i32,
     pub author_id: i32,
-    #[serde(skip_deserializing)]
     pub send_time: DateTime,
     pub content: Option<String>,
     pub chat_id: i32,
