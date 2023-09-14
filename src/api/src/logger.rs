@@ -5,7 +5,7 @@ use std::fs::File;
 pub fn create_logger() {
     CombinedLogger::init(vec![
         TermLogger::new(
-            LevelFilter::Debug,
+            LevelFilter::Warn,
             Config::default(),
             TerminalMode::Mixed,
             ColorChoice::Auto,

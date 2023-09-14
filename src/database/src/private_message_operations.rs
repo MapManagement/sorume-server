@@ -1,4 +1,5 @@
 use entities::*;
+use log::*;
 use sea_orm::*;
 
 pub async fn insert_private_message(
@@ -16,7 +17,19 @@ pub async fn insert_private_message(
     .insert(connection)
     .await;
 
-    return new_message;
+    match new_message {
+        Ok(message) => {
+            info!(
+                "C: New private message has been created: {:?}",
+                message.private_message_id
+            );
+            return Ok(message);
+        }
+        Err(err) => {
+            warn!("C: Unable to create a new private message: {}", err);
+            return Err(err);
+        }
+    }
 }
 
 pub async fn update_private_message(
@@ -27,6 +40,7 @@ pub async fn update_private_message(
     let target_message = get_private_message_by_id(message_id, connection).await;
 
     if target_message.is_err() {
+        warn!("U: Private message with ID {:?} does not exist", message_id);
         return Err(target_message.unwrap_err());
     }
 

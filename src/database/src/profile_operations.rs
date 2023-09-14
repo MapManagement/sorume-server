@@ -31,11 +31,11 @@ pub async fn insert_profile(
 
     match new_profile {
         Ok(profile) => {
-            info!("New profile has been created: {:?}", profile.profile_id);
+            info!("C: New profile has been created: {:?}", profile.profile_id);
             return Ok(profile);
         }
         Err(err) => {
-            warn!("Unable to create a new profile: {}", err);
+            warn!("C: Unable to create a new profile: {}", err);
             return Err(err);
         }
     }
@@ -53,6 +53,7 @@ pub async fn update_profile(
     let target_profile = check_profile_exists(profile_id, connection).await;
 
     if target_profile.is_err() {
+        warn!("U: Profile with ID {:?} does not exist", profile_id);
         return Err(target_profile.unwrap_err());
     }
 

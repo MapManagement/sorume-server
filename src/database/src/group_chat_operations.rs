@@ -4,6 +4,7 @@ use crate::{
 };
 use chrono::Local;
 use entities::*;
+use log::*;
 use sea_orm::*;
 
 // TODO: error handling
@@ -12,6 +13,8 @@ pub async fn insert_group_chat(
     connection: &DbConn,
 ) -> Result<group_chat::Model, DbErr> {
     if member_ids.len() < 1 {
+        warn!("Cannot create a group chat with less than one member");
+
         return Err(DbErr::Custom(
             "A group chat needs at least one member.".to_owned(),
         ));
@@ -46,6 +49,17 @@ pub async fn insert_group_chat(
         new_members.push(new_member.unwrap());
     }
 
+    if new_members.len() < 1 {
+        warn!(
+            "Cannot create a group chat with less than one member. All given profile were faulty"
+        );
+
+        return Err(DbErr::Custom(
+            "A group chat needs at least one member. All given profiles couldn't be resolved."
+                .to_owned(),
+        ));
+    }
+
     return Ok(new_group_chat);
 }
 
@@ -63,9 +77,12 @@ pub async fn update_group_chat(
 
             Ok(target_group_chat.update(connection).await?)
         }
-        _ => Err(DbErr::Custom(
-            "Couldn't find a group chat with the specified identifier.".to_owned(),
-        )),
+        _ => {
+            warn!("Group chat with ID {:?} does not exist", group_chat_id);
+            Err(DbErr::Custom(
+                "Couldn't find a group chat with the specified identifier.".to_owned(),
+            ))
+        }
     }
 }
 
