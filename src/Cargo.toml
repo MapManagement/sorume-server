@@ -9,7 +9,7 @@ edition = "2021"
 members = [".", "api", "database", "entitites", "migration"]
 
 [dependencies]
-sea-orm = { version = "0.12", default-features = false, features = [ "sqlx-mysql", "runtime-tokio-rustls", "macros", "with-chrono" ] }
+sea-orm = { version = "0.12", default-features = false, features = [ "sqlx-mysql", "runtime-async-std-rustls", "macros", "with-chrono" ] }
 futures = "0.3.28"
 api = { path = "api" }
 migration = { path = "migration" }
