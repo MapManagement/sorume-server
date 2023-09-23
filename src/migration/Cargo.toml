@@ -7,8 +7,9 @@ edition = "2021"
 async-std = { version = "1", features = ["attributes", "tokio1"] }
 
 [dependencies.sea-orm-migration]
-version = "0.11.0"
+version = "0.12.0"
 features = [
-    "runtime-async-std-native-tls",
+    "runtime-tokio-rustls",
     "sqlx-mysql"
 ]
+default-features = false

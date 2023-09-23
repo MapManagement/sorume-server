@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 chrono = { version = "0.4" }
 futures = "0.3.21"
-sea-orm = { version = "0.11.3", features = [ "sqlx-mysql", "runtime-async-std-native-tls", "macros", "with-chrono" ] }
+sea-orm = { version = "0.12", default-features = false, features = [ "sqlx-mysql", "runtime-tokio-rustls", "macros", "with-chrono" ] }
 dotenvy = "0.15"
 log = "0.4.19"
 entities = { path = "../entities" }
