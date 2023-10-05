@@ -11,7 +11,15 @@ Following shorthands are used for different types of operations:
 
 ## Debug
 
-N/A
+- reading an object
+
+```rust
+```
+
+- invalid id when reading an object
+
+```rust
+```
 
 ## Information
 
@@ -37,10 +45,19 @@ Err(err) => {
 
 ```
 
-- failed update operation
+- invalid id when updating or deleting an object
 
 ```rust
 warn!("U: Profile with ID {:?} does not exist", profile_id);
+```
+
+- failed update operation
+
+```rust
+Err(err) => {
+    warn!("U: Unable to update profile: {}", err);
+    return Err(err);
+}
 ```
 
 - not enough objects
