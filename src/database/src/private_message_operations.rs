@@ -47,7 +47,21 @@ pub async fn update_private_message(
     let mut target_message: private_message::ActiveModel = target_message.unwrap().into();
     target_message.content = Set(Some(content.to_owned()));
 
-    Ok(target_message.update(connection).await?)
+    let update_result = target_message.update(connection).await;
+
+    match update_result {
+        Ok(updated_message) => {
+            info!(
+                "U: Message has been updated: {:?}",
+                updated_message.private_message_id
+            );
+            return Ok(updated_message);
+        }
+        Err(err) => {
+            warn!("U: Unable to update profile: {}", err);
+            return Err(err);
+        }
+    }
 }
 
 pub async fn get_private_messages_of_chat(
@@ -55,27 +69,48 @@ pub async fn get_private_messages_of_chat(
     recipient_id: i32,
     connection: &DbConn,
 ) -> Result<Vec<private_message::Model>, DbErr> {
-    let target_messages = private_message::Entity::find()
+    let read_result = private_message::Entity::find()
         .filter(private_message::Column::SenderId.eq(sender_id))
         .filter(private_message::Column::RecipientId.eq(recipient_id))
         .all(connection)
-        .await?;
+        .await;
 
-    return Ok(target_messages);
+    match read_result {
+        Ok(messages) => {
+            debug!(
+                "R: Messages of private chat between {} and {} have been found",
+                sender_id, recipient_id
+            );
+            return Ok(messages);
+        }
+        Err(err) => {
+            debug!(
+                "R: Private chat between {} and {} does not exist",
+                sender_id, recipient_id
+            );
+            return Err(err);
+        }
+    }
 }
 
 pub async fn get_private_message_by_id(
     message_id: i32,
     connection: &DbConn,
 ) -> Result<private_message::Model, DbErr> {
-    let target_message = private_message::Entity::find_by_id(message_id)
+    let message_result = private_message::Entity::find_by_id(message_id)
         .one(connection)
-        .await?
-        .ok_or(DbErr::Custom(
-            "Couldn't find a message with the specified identifier.".to_owned(),
-        ));
+        .await;
 
-    return target_message;
+    match message_result {
+        Ok(message) => {
+            debug!("R: Private message with ID {} has been found", message_id);
+            return Ok(message.unwrap());
+        }
+        Err(err) => {
+            debug!("R: Private message with ID {} does not exist", message_id);
+            return Err(err);
+        }
+    }
 }
 
 pub async fn delete_private_message_by_id(
